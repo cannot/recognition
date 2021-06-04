@@ -1,0 +1,15 @@
+---
+application:
+  name: "recognition"
+  project: "recognition"
+  organization: "QoveryCommunity"
+databases:
+- type: "MONGODB"
+  name: "faceroom"
+  version: "4.2"
+routers:
+- name: "main-recognition"
+  routes:
+  - application_name: "recognition"
+    paths:
+    - "/*"
