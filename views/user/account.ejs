@@ -1,0 +1,101 @@
+<%- include('../includes/header.ejs') %>
+    <%- include('../includes/nav.ejs') %>
+        <style>
+            div.preview-images>img {
+                width: 100%;
+            }
+        </style>
+        <div id="layoutSidenav">
+            <%- include('../includes/menu.ejs') %>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <h1 class="mt-4">
+                                <%= pageTitle %>
+                            </h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item active">
+                                    <%= pageTitle %>
+                                </li>
+                            </ol>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <img src="./<%= user.userId %>/<%= user.userId %>1.jpg" alt="<%= user.userId %>" width="100%">
+                                    <div class="preview-images"></div>
+                                    <form class="mt-4" method="POST" action="/upload-profile-pic" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <input type="file" name="profile_pic" />
+                                        </div>
+                                        <input type="submit" name="btn_upload_profile_pic" value="Upload" />
+                                    </form>
+                                </div>
+                                <div class="col-sm-8">
+                                    <form action="/register" method="POST">
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="firstname">First Name</label>
+                                                    <input type="text" id="firstname" name="firstname" class="form-control py-4 <% if (errFields.errFirstName) { %>is-invalid<% } %>" required="required" value="<%= profile.firstname %>" placeholder="Enter First Name">
+                                                    <div class="invalid-feedback">
+                                                        <%= errFields.errFirstName %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="lastname">Last Name</label>
+                                                    <input type="text" id="lastname" name="lastname" class="form-control py-4 <% if (errFields.errLastName) { %>is-invalid<% } %>" required="required" value="<%= profile.lastname %>" placeholder="Enter Last Name">
+                                                    <div class="invalid-feedback">
+                                                        <%= errFields.errLastName %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="email">Email</label>
+                                            <input type="email" id="email" name="email" class="form-control py-4 <% if (errFields.errEmail) { %>is-invalid<% } %>" required="required" value="<%= profile.email %>" aria-describedby="emailHelp" placeholder="Enter email address">
+                                            <div class="invalid-feedback">
+                                                <%= errFields.errEmail %>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="username">Username</label>
+                                            <input type="text" id="username" name="username" class="form-control py-4 <% if (errFields.errUsername) { %>is-invalid<% } %>" required="required" value="<%= profile.username %>" placeholder="Enter Username">
+                                            <div class="invalid-feedback">
+                                                <%= errFields.errUsername %>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+
+                    <%- include('../includes/nav-footer.ejs') %>
+                        <script>
+                            $(document).ready(function() {
+                                let imagesPreview = function(input, placeToInsertImagePreview) {
+                                    if (input.files) {
+                                        let filesAmount = input.files.length;
+                                        for (i = 0; i < filesAmount; i++) {
+                                            let reader = new FileReader();
+                                            reader.onload = function(event) {
+                                                $($.parseHTML("<img>"))
+                                                    .attr("src", event.target.result)
+                                                    .appendTo(placeToInsertImagePreview);
+                                            };
+                                            reader.readAsDataURL(input.files[i]);
+                                        }
+                                    }
+                                };
+                                $("#input-files").on("change", function() {
+                                    imagesPreview(this, "div.preview-images");
+                                });
+                            });
+                        </script>
+                </div>
+        </div>
+
+        <%- include('../includes/footer.ejs') %>

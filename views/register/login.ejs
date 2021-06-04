@@ -1,0 +1,55 @@
+<%- include('../includes/header.ejs') %>
+
+	<div class="bg-primary" id="layoutAuthentication">
+		<div id="layoutAuthentication_content">
+			<main>
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="col-lg-5">
+							<div class="card shadow-lg border-0 rounded-lg mt-5">
+								<div class="card-header"><h3 class="text-center font-weight-light my-4"><%= pageTitle %></h3></div>
+								<div class="card-body">
+									<% if(errMessage) { %>
+										<div><%= errMessage %></div>
+									<% } %>
+									<form action="/login" method="POST">
+										<div class="form-group">
+											<label class="small mb-1" for="logemail">Email</label>
+											<input 
+												type="email" 
+												id="logemail" 
+												name="logemail" 
+												class="form-control py-4 <% if (errFields.errEmail) { %>is-invalid<% } %>"  
+												required="required" 
+												value="<%= oldInput.logemail %>" 
+												placeholder="Enter email address" >
+											<div class="invalid-feedback" ><%= errFields.errEmail %></div>
+										</div>
+										<div class="form-group">
+											<label class="small mb-1" for="logpassword">Password</label>
+											<input 
+												type="password" 
+												id="logpassword" 
+												name="logpassword" 
+												class="form-control py-4 <% if (errFields.errPassword) { %>is-invalid<% } %>"  
+												required="required"
+												placeholder="Enter password" >
+											<div class="invalid-feedback" ><%= errFields.errPassword %></div>
+										</div>
+										<div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
+											<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+											<input type="submit" class="btn btn-primary" value="Log in">
+										</div>
+									</form>
+								</div>
+								<div class="card-footer text-center">
+									<div class="small"><a href="/register">ยังไม่มีข้อมูล? สมัครสมาชิก!</a></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+<%- include('../includes/footer.ejs') %>
