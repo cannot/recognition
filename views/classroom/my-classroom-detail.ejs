@@ -1,0 +1,240 @@
+<%- include('../includes/header.ejs') %>
+    <%- include('../includes/nav.ejs') %>
+        <style type="text-css">
+
+        </style>
+        <div id="layoutSidenav">
+            <%- include('../includes/menu.ejs') %>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <h1 class="mt-4">
+                                <%= pageTitle %>
+                            </h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item active">
+                                    <%= pageTitle %>
+                                </li>
+                            </ol>
+                            <% if(errMessage) { %>
+                                <%= errMessage %>
+                                    <% } %>
+                                        <div class="card-body ">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered" id="dataClass" width="100%" cellspacing="0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>CLASS NAME</td>
+                                                            <td>
+                                                                <%= classroom.title %>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>CLASS DESCRIPTION</td>
+                                                            <td>
+                                                                <%= classroom.description %>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>LAST CHECK</td>
+                                                            <td>
+                                                                <div class="center-content page-container">
+                                                                    <div style="position: relative" class="margin">
+                                                                        <img id="inputImg" src="../<%= classroom.id %>/<%= classroom.id %>-<%= today %>.jpg" alt="<%= classroom.id %>" style="max-width: 800px;" />
+                                                                        <canvas id="overlay" class="overlay" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>ATTENDANCE</td>
+                                                            <td>
+                                                                <form class="mt-4" method="POST" action="/upload-attend-pic/<%= classroom.id %>" enctype="multipart/form-data">
+                                                                    <div class="form-group">
+                                                                        <input type="file" name="profile_pic" />
+                                                                        <input type="hidden" name="classroomId" value="<%= classroom.id %>">
+                                                                    </div>
+                                                                    <input type="submit" name="btn_upload_profile_pic" value="Upload" />
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>studentId</th>
+                                                            <th>Attendance Time</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if (registrations.length > 0) { %>
+                                                            <% for(let registration of registrations) { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= registration.student %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <!-- <%= registration.attendanceDate %> -->
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                                                    <%} else { %>
+                                                                        <tr>
+                                                                            <td colspan="2">No Registration</td>
+                                                                        </tr>
+                                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                        </div>
+                    </main>
+                    <script src="../face-api.js"></script>
+                    <!-- <script src="../js/commons.js"></script> -->
+                    <script src="../js/faceDetectionControls.js"></script>
+                    <script src="../js/imageSelectionControls.js"></script>
+                    <!-- <script src="../js/bbt.js"></script> -->
+                    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+                    <script>
+                        const classes = [<% if (registrations.length > 0) { for(let registration of registrations) { %>
+                            '<%= registration.student %>',
+                            <% } } %>
+                        ]
+
+
+                        function getFaceImageUri(className, idx) {
+                            return `../${className}/${className}${idx}.jpg`
+                        }
+
+                        function renderFaceImageSelectList(selectListId, onChange, initialValue) {
+                            const indices = [1, 2, 3, 4, 5]
+
+                            function renderChildren(select) {
+                                classes.forEach(className => {
+                                    const optgroup = document.createElement('optgroup')
+                                    optgroup.label = className
+                                    select.appendChild(optgroup)
+                                    indices.forEach(imageIdx =>
+                                        renderOption(
+                                            optgroup,
+                                            `${className} ${imageIdx}`,
+                                            getFaceImageUri(className, imageIdx)
+                                        )
+                                    )
+                                })
+                            }
+
+                            renderSelectList(
+                                selectListId,
+                                onChange,
+                                getFaceImageUri(initialValue.className, initialValue.imageIdx),
+                                renderChildren
+                            )
+                        }
+
+                        // fetch first image of each class and compute their descriptors
+                        async function createBbtFaceMatcher(numImagesForTraining = 1) {
+                            const maxAvailableImagesPerClass = 5
+                            numImagesForTraining = Math.min(numImagesForTraining, maxAvailableImagesPerClass)
+
+                            const labeledFaceDescriptors = await Promise.all(classes.map(
+                                async className => {
+                                    const descriptors = []
+                                    for (let i = 1; i < (numImagesForTraining + 1); i++) {
+                                        const img = await faceapi.fetchImage(getFaceImageUri(className, i))
+                                        descriptors.push(await faceapi.computeFaceDescriptor(img))
+                                    }
+
+                                    return new faceapi.LabeledFaceDescriptors(
+                                        className,
+                                        descriptors
+                                    )
+                                }
+                            ))
+
+                            return new faceapi.FaceMatcher(labeledFaceDescriptors)
+                        }
+
+                        let faceMatcher = null
+
+                        async function updateResults() {
+                            if (!isFaceDetectionModelLoaded()) {
+                                return
+                            }
+
+                            const inputImgEl = $('#inputImg').get(0)
+
+                            const options = getFaceDetectorOptions()
+                            const results = await faceapi
+                                .detectAllFaces(inputImgEl, options)
+                                .withFaceLandmarks()
+                                .withFaceDescriptors()
+
+                            drawFaceRecognitionResults(results)
+                        }
+
+                        function drawFaceRecognitionResults(results) {
+                            const canvas = $('#overlay').get(0)
+                            const inputImgEl = $('#inputImg').get(0)
+
+                            faceapi.matchDimensions(canvas, inputImgEl)
+                                // resize detection and landmarks in case displayed image is smaller than
+                                // original size
+                            const resizedResults = faceapi.resizeResults(results, inputImgEl)
+
+                            resizedResults.forEach(({
+                                detection,
+                                descriptor
+                            }) => {
+
+                                const label = faceMatcher.findBestMatch(descriptor).toString()
+                                const options = {
+                                    label
+                                }
+
+                                const stuid = label.split(" ")[0]
+
+                                //alert("/classrooms/take_attendance/<%= classroom._id %>/" + stuid);
+                                $.ajax({
+                                    url: "/classrooms/take_attendance/<%= classroom._id %>/" + stuid,
+                                    type: "GET",
+                                    contentType: "application/json",
+                                    processData: false,
+                                    data: stuid,
+                                    complete: function(d) {
+                                        console.log(JSON.stringify(d.responseText));
+                                    }
+                                });
+
+                                const drawBox = new faceapi.draw.DrawBox(detection.box, options)
+                                drawBox.draw(canvas)
+                            })
+                        }
+
+                        async function run() {
+                            // load face detection, face landmark model and face recognition models
+                            await changeFaceDetector(selectedFaceDetector)
+                            await faceapi.loadFaceLandmarkModel('/')
+                            await faceapi.loadFaceRecognitionModel('/')
+
+                            // initialize face matcher with 1 reference descriptor per bbt character
+                            faceMatcher = await createBbtFaceMatcher(1)
+
+                            // start processing image
+                            updateResults()
+                        }
+
+                        $(document).ready(function() {
+                            run()
+                        })
+                    </script>
+                    <%- include('../includes/nav-footer.ejs') %>
+                </div>
+        </div>
+        <%- include('../includes/footer.ejs') %>

@@ -1,0 +1,70 @@
+<%- include('../includes/header.ejs') %>
+    <%- include('../includes/nav.ejs') %>
+        <div id="layoutSidenav">
+            <%- include('../includes/menu.ejs') %>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <h1 class="mt-4">
+                                <%= pageTitle %>
+                            </h1>
+                            <div class="card-header">
+                                <i class="fas fa-table mr-1"></i>
+                                <%= pageTitle %>
+                            </div>
+
+                            <% if(errMessage) { %>
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <%= errMessage %>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <div class="row">
+
+                                        <div class="col-xl-12 col-md-12">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered" id="dataTable" width="100%"
+                                                        cellspacing="0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>ชื่อวิชา</th>
+                                                                <th>รายละเอียด</th>
+                                                                <th>ลงทะเบียน</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% if (classrooms.length> 0) { %>
+                                                                <% for(let classroom of classrooms) { %>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <%= classroom.title %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= classroom.description %>
+                                                                        </td>
+                                                                        <td><a class=""
+                                                                                href="/classrooms/reg/<%= classroom.id %>">ลงทะเบียน</a></td>
+
+                                                                    </tr>
+                                                                    <% } %>
+                                                                        <%} else { %>
+                                                                            <tr>
+                                                                                <td colspan="3">ไม่มีคลาสเรียนที่ลงได้</td>
+                                                                            </tr>
+                                                                            <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                        </div>
+                    </main>
+                    <%- include('../includes/nav-footer.ejs') %>
+                </div>
+        </div>
+        <%- include('../includes/footer.ejs') %>

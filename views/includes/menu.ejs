@@ -1,0 +1,55 @@
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Core</div>
+                <a class="nav-link" href="/">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <div class="sb-sidenav-menu-heading">Attendance</div>
+                <a class="nav-link collapsed <%= isLogin && isStudent ? '' : 'd-none' %>" href="#" data-toggle="collapse" data-target="#collapseStudents" aria-expanded="false" aria-controls="collapseStudents">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    เมนูนักศึกษา
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse <%= isLogin && isStudent ? '' : 'd-none' %>" id="collapseStudents" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="/student-classrooms">ห้องเรียนของฉัน</a>
+                        <a class="nav-link" href="/classrooms">หลักสูตรที่เปิดสอน</a>
+                    </nav>
+                </div>
+                <a class="nav-link collapsed <%= isLogin && isTeacher ? '' : 'd-none' %>" href="#" data-toggle="collapse" data-target="#collapseTeachers" aria-expanded="false" aria-controls="collapseTeachers">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    เมนูอาจารย์
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse <%= isLogin && isTeacher ? '' : 'd-none' %>" id="collapseTeachers" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="/my-classrooms">หลักสูตรของฉัน</a>
+                        <a class="nav-link" href="/teacherreport">Report</a>
+                    </nav>
+                </div>
+
+
+                <div class="sb-sidenav-menu-heading">Authentication</div>
+                <a class="nav-link <%= isLogin ? 'd-none' : '' %>" href="/login">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                    เข้าสู่ระบบ
+                </a>
+                <a class="nav-link <%= isLogin ? 'd-none' : '' %>" href="/register">
+                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                    ลงทะเบียน
+                </a>
+                <a class="nav-link <%= isLogin ? '' : 'd-none' %>" href="/logout">
+                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                    ออกจากระบบ
+                </a>
+            </div>
+        </div>
+        <div class="sb-sidenav-footer <%= isLogin ? 'd-block' : 'd-none' %>">
+            <div class="small">Logged in as:</div>
+            <%= user.userFirstname %>
+        </div>
+    </nav>
+</div>

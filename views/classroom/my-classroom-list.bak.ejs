@@ -1,0 +1,150 @@
+<%- include('../includes/header.ejs') %>
+    <%- include('../includes/nav.ejs') %>
+        <div id="layoutSidenav">
+            <%- include('../includes/menu.ejs') %>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <h1 class="mt-4">
+                                <%= pageTitle %>
+                            </h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item active">
+                                    <%= pageTitle %>
+                                </li>
+                            </ol>
+
+                            <% if(errMessage) { %>
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <%= errMessage %>
+                                    </div>
+                                </div>
+                                <% } %>
+                                    <div class="row">
+                                        <% if (classrooms.length> 0) { %>
+                                            <% for(let classroom of classrooms) { %>
+                                                <div class="col-xl-3 col-md-6">
+                                                    <div class="card bg-primary text-white mb-4">
+                                                        <div
+                                                            class="card-header d-flex align-items-center justify-content-between">
+                                                            <%= classroom.title %>
+                                                                <div class="small text-white"><i
+                                                                        class="fas fa-trash <%= isLogin ? 'd-block' : 'd-none' %>"
+                                                                        onclick="deleteClass(this)"></i></div>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <%= classroom.description %>
+                                                        </div>
+                                                        <div
+                                                            class="card-footer d-flex align-items-center justify-content-between">
+                                                            <a class="small text-white stretched-link"
+                                                                href="/my-classrooms/<%= classroom.id %>">View
+                                                                Attendance</a>
+                                                            <div class="small text-white"><i
+                                                                    class="fas fa-angle-right"></i></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% } %>
+                                                    <%} else { %>
+                                                        <div class="card mb-4">
+                                                            <div class="card-body">
+                                                                No Class room
+                                                            </div>
+                                                        </div>
+                                                        <% } %>
+
+                                                            <div class="col-xl-3 col-md-6">
+                                                                <div class="card bg-success text-white mb-4">
+                                                                    <div class="card-body"></div>
+                                                                    <div
+                                                                        class="card-footer d-flex align-items-center justify-content-between">
+                                                                        <a class="small text-white stretched-link"
+                                                                            href="/add-classroom">New Classroom</a>
+                                                                        <div class="small text-white"><i
+                                                                                class="far fa-plus-square"></i></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xl-12 col-md-12">
+                                                                <div class="card-header">
+                                                                    <i class="fas fa-table mr-1"></i>
+                                                                    My Classroom
+                                                                    <div class="small text-white right"><i
+                                                                            class="far fa-plus-square"></i><a class=""
+                                                                            href="/add-classroom">New Classroom</a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered"
+                                                                            id="dataTable" width="100%" cellspacing="0">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>#</th>
+                                                                                    <th>Title</th>
+                                                                                    <th>Description</th>
+                                                                                    <th>Attendance</th>
+                                                                                    <th>#</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <% if (classrooms.length> 0) { %>
+                                                                                    <% for(let classroom of classrooms)
+                                                                                        { %>
+                                                                                        <tr>
+                                                                                            <td></td>
+                                                                                            <td>
+                                                                                                <%= classroom.title %>
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <%= classroom.description
+                                                                                                    %>
+                                                                                            </td>
+                                                                                            <td><a class=""
+                                                                                                    href="/my-classrooms/<%= classroom.id %>">View
+                                                                                                    Attendance</a></td>
+                                                                                            <td><a class="deleteClass"
+                                                                                                    href="#"><i
+                                                                                                        class="fas fa-trash <%= isLogin ? 'd-block' : 'd-none' %>"></i></a>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <% } %>
+                                                                                            <%} else { %>
+                                                                                                <tr>
+                                                                                                    <td colspan="5">No
+                                                                                                        Class room</td>
+                                                                                                </tr>
+                                                                                                <% } %>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                    </div>
+
+                        </div>
+                    </main>
+
+                    <%- include('../includes/nav-footer.ejs') %>
+                </div>
+        </div>
+        <%- include('../includes/footer.ejs') %>
+            <script>
+
+                (function ($) {
+                    "use strict";
+
+                    // Toggle the side navigation
+                    $(".deleteClass").on("click", function (e) {
+                        e.preventDefault();
+                        alert(this);
+                    });
+
+                    $('#dataTable').DataTable();
+
+
+                })(jQuery);
+
+            </script>
